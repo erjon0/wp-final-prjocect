@@ -1,4 +1,3 @@
-
 <?php
 function bizshare_setup() {
     add_theme_support('post-thumbnails');
@@ -10,7 +9,7 @@ add_action('after_setup_theme', 'bizshare_setup');
 function bizshare_register_cpt() {
     register_post_type('business',[
         'label'=>'Businesses','public'=>true,'has_archive'=>true,
-        'menu_icon'=>'dashicons-store','supports'=>['title','editor','thumbnail','author']
+        'menu_icon'=>'dashicons-store','supports'=>['title','editor','thumbnail','author','comments']
     ]);
 }
 add_action('init','bizshare_register_cpt');
