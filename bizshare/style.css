@@ -1,7 +1,7 @@
 /*
 Theme Name: BizShare
 Theme URI: https://example.com
-Author: Erjon Benquku
+Author: ErjSn Benquku
 Description: Modern Business Sharing WordPress Theme
 Version: 2.0
 License: GNU General Public License v2 or later
@@ -764,6 +764,52 @@ footer a:hover {
   font-weight: 600;
   color: #d84040;
   margin: 10px 0;
+}
+
+/* ===========================
+   STAR RATING
+=========================== */
+.star-rating {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.star {
+  font-size: 1.2rem;
+  color: #ddd;
+  transition: color 0.3s ease;
+}
+
+.star.filled {
+  color: #ffc107;
+}
+
+.post-meta .star-rating {
+  margin-left: 5px;
+}
+
+.post-meta .star-rating .star {
+  font-size: 1rem;
+}
+
+.business-card .star-rating {
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.business-card .star-rating .star {
+  font-size: 1.3rem;
+}
+
+/* Rating in meta box */
+#business_rating {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
 /* ===========================
