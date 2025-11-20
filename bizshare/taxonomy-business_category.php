@@ -16,6 +16,10 @@
 <?php endif; ?>
 <a href="<?php the_permalink(); ?>" class="btn">View Details</a>
 </article>
-<?php endwhile; echo '</div>'; } else { echo '<p class="no-results">No businesses found in this category.</p>'; } ?>
+<?php endwhile; echo '</div>';
+
+bizshare_pagination();
+
+} else { echo '<p class="no-results">No businesses found in this category.</p>'; } ?>
 </div>
 <?php get_footer(); ?>
