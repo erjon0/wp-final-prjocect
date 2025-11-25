@@ -68,7 +68,7 @@
         
         // View All Businesses button
         echo '<div class="view-all-container">';
-        echo '<a href="' . home_url('/businesses/') . '" class="btn btn-view-all">View All Businesses</a>';
+        echo '<a href="' . home_url('businesses') . '" class="btn btn-view-all">View All Businesses</a>';
         echo '</div>';
         
         wp_reset_postdata(); 
