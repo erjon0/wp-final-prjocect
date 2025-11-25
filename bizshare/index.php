@@ -3,6 +3,15 @@
 <div class="page-header">
     <h1>Latest Businesses</h1>
     <p>Explore recently added businesses in our directory</p>
+    <div class="header-actions">
+        <a href="<?php echo bizshare_get_page_url('search-business'); ?>" class="btn">Search Businesses</a>
+        <a href="<?php echo bizshare_get_page_url('top-businesses'); ?>" class="btn">Top Rated</a>
+        <?php if (is_user_logged_in()): ?>
+            <a href="<?php echo bizshare_get_page_url('dashboard'); ?>" class="btn btn-add">Add Business</a>
+        <?php else: ?>
+            <a href="<?php echo wp_login_url(bizshare_get_page_url('dashboard')); ?>" class="btn btn-add">Login to Add Business</a>
+        <?php endif; ?>
+    </div>
 </div>
 
 <!-- Latest Businesses Section -->
@@ -59,14 +68,18 @@
         
         // View All Businesses button
         echo '<div class="view-all-container">';
-        echo '<a href="' . home_url('/?show_all=businesses') . '" class="btn btn-view-all">View All Businesses</a>';
+        echo '<a href="' . home_url('/businesses/') . '" class="btn btn-view-all">View All Businesses</a>';
         echo '</div>';
         
         wp_reset_postdata(); 
     } else { 
         echo '<div class="no-businesses-message">';
         echo '<p>No businesses found yet. Be the first to add one!</p>';
-        echo '<a href="' . admin_url('post-new.php?post_type=business') . '" class="btn btn-add-business">Add Your Business</a>';
+        if (is_user_logged_in()) {
+            echo '<a href="' . admin_url('post-new.php?post_type=business') . '" class="btn btn-add-business">Add Your Business</a>';
+        } else {
+            echo '<a href="' . wp_registration_url() . '" class="btn btn-add-business">Register to Add Business</a>';
+        }
         echo '</div>';
     }
     ?>
@@ -144,7 +157,7 @@
     </div>
 </section>
 
-<!-- All Businesses Grid (existing code) -->
+<!-- All Businesses Grid -->
 <section class="all-businesses-section">
     <h2 class="section-title">All Businesses</h2>
     

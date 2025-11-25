@@ -66,20 +66,31 @@ if($q->have_posts()){
         <?php if (has_post_thumbnail()) {
             the_post_thumbnail('medium');
         } else { ?>
-            <div style="background: #f0f0f0; height: 180px; display: flex; align-items: center; justify-content: center; color: #666;">
+            <div class="business-placeholder">
                 🏢 Business Image
             </div>
         <?php } ?>
-        <h3><?php the_title(); ?></h3>
-        
-        <?php if ($rating): ?>
-            <div class="rating-display"><?php echo bizshare_get_star_rating($rating); ?> <?php echo $rating; ?>/5</div>
-        <?php endif; ?>
-        
-        <?php if(has_excerpt()): ?>
-        <p><?php echo wp_trim_words(get_the_excerpt(), 15); ?></p>
-        <?php endif; ?>
-        <a href="<?php the_permalink(); ?>" class="btn">View Details</a>
+        <div class="business-card-content">
+            <h3><?php the_title(); ?></h3>
+            
+            <?php if ($rating): ?>
+                <div class="rating-display">
+                    <?php echo bizshare_get_star_rating($rating); ?>
+                    <span class="rating-text"><?php echo $rating; ?>/5</span>
+                </div>
+            <?php endif; ?>
+            
+            <?php if(has_excerpt()): ?>
+            <p class="business-excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15); ?></p>
+            <?php endif; ?>
+            
+            <div class="business-meta">
+                <span class="business-date">📅 <?php echo get_the_date(); ?></span>
+                <span class="business-author">👤 <?php echo get_the_author(); ?></span>
+            </div>
+            
+            <a href="<?php the_permalink(); ?>" class="btn btn-view">View Details</a>
+        </div>
     </article>
     <?php endwhile; 
     echo '</div>';
@@ -93,8 +104,23 @@ if($q->have_posts()){
     echo '<div class="suggestions">';
     echo '<a href="' . home_url() . '" class="btn">Browse All Businesses</a>';
     echo '<a href="' . bizshare_get_page_url('top-businesses') . '" class="btn">View Top Rated</a>';
+    echo '<a href="' . admin_url('post-new.php?post_type=business') . '" class="btn btn-add">Add Your Business</a>';
     echo '</div>';
     echo '</div>'; 
+} else { 
+    // Show welcome message when no search has been performed
+    echo '<div class="no-results-wrapper">';
+    echo '<p class="no-results">Use the search form above to find businesses by name or category.</p>';
+    echo '<div class="suggestions">';
+    echo '<a href="' . home_url() . '" class="btn">Browse All Businesses</a>';
+    echo '<a href="' . bizshare_get_page_url('top-businesses') . '" class="btn">View Top Rated Businesses</a>';
+    if (is_user_logged_in()) {
+        echo '<a href="' . admin_url('post-new.php?post_type=business') . '" class="btn btn-add">Add New Business</a>';
+    } else {
+        echo '<a href="' . wp_login_url(bizshare_get_page_url('dashboard')) . '" class="btn btn-add">Login to Add Business</a>';
+    }
+    echo '</div>';
+    echo '</div>';
 } ?>
 </div>
 <?php get_footer(); ?>

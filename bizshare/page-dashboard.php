@@ -31,20 +31,29 @@ $user = wp_get_current_user();
             <?php if (has_post_thumbnail()) {
                 the_post_thumbnail('medium');
             } else { ?>
-                <div style="background: #f0f0f0; height: 180px; display: flex; align-items: center; justify-content: center; color: #666;">
+                <div class="business-placeholder">
                     🏢 Business Image
                 </div>
             <?php } ?>
-            <h3><?php the_title(); ?></h3>
-            
-            <?php if ($rating): ?>
-                <div class="rating-display"><?php echo bizshare_get_star_rating($rating); ?> <?php echo $rating; ?>/5</div>
-            <?php endif; ?>
-            
-            <div class="card-actions">
-                <a href="<?php the_permalink(); ?>" class="btn">View</a>
-                <a href="<?php echo get_edit_post_link(get_the_ID()); ?>" class="btn btn-edit">Edit</a>
-                <a href="<?php echo get_delete_post_link(get_the_ID(), '', true); ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this business?')">Delete</a>
+            <div class="business-card-content">
+                <h3><?php the_title(); ?></h3>
+                
+                <?php if ($rating): ?>
+                    <div class="rating-display">
+                        <?php echo bizshare_get_star_rating($rating); ?>
+                        <span class="rating-text"><?php echo $rating; ?>/5</span>
+                    </div>
+                <?php endif; ?>
+                
+                <?php if (has_excerpt()): ?>
+                    <p class="business-excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15); ?></p>
+                <?php endif; ?>
+                
+                <div class="card-actions">
+                    <a href="<?php the_permalink(); ?>" class="btn">View</a>
+                    <a href="<?php echo get_edit_post_link(get_the_ID()); ?>" class="btn btn-edit">Edit</a>
+                    <a href="<?php echo get_delete_post_link(get_the_ID(), '', true); ?>" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this business?')">Delete</a>
+                </div>
             </div>
         </article>
         <?php endwhile; echo '</div>'; wp_reset_postdata(); 

@@ -32,7 +32,20 @@ function bizshare_register_cpt() {
         'has_archive'=>true,
         'menu_icon'=>'dashicons-store',
         'supports'=>['title','editor','thumbnail','author','comments'],
-        'show_in_rest' => true // Enable Gutenberg editor
+        'show_in_rest' => true,
+        'rewrite' => array('slug' => 'businesses'),
+        'labels' => array(
+            'name' => 'Businesses',
+            'singular_name' => 'Business',
+            'add_new' => 'Add New Business',
+            'add_new_item' => 'Add New Business',
+            'edit_item' => 'Edit Business',
+            'new_item' => 'New Business',
+            'view_item' => 'View Business',
+            'search_items' => 'Search Businesses',
+            'not_found' => 'No businesses found',
+            'not_found_in_trash' => 'No businesses found in Trash'
+        )
     ]);
 }
 add_action('init','bizshare_register_cpt');
@@ -42,7 +55,20 @@ function bizshare_register_tax() {
         'label'=>'Business Categories',
         'rewrite'=>['slug'=>'business-category'],
         'hierarchical'=>true,
-        'show_in_rest' => true // Enable in REST API
+        'show_in_rest' => true,
+        'labels' => array(
+            'name' => 'Business Categories',
+            'singular_name' => 'Business Category',
+            'search_items' => 'Search Categories',
+            'all_items' => 'All Categories',
+            'parent_item' => 'Parent Category',
+            'parent_item_colon' => 'Parent Category:',
+            'edit_item' => 'Edit Category',
+            'update_item' => 'Update Category',
+            'add_new_item' => 'Add New Category',
+            'new_item_name' => 'New Category Name',
+            'menu_name' => 'Categories'
+        )
     ]);
 }
 add_action('init','bizshare_register_tax');
@@ -74,22 +100,18 @@ function bizshare_rating_callback($post) {
 }
 
 function bizshare_save_rating($post_id) {
-    // Check if our nonce is set and verify it
     if (!isset($_POST['bizshare_rating_nonce']) || !wp_verify_nonce($_POST['bizshare_rating_nonce'], 'bizshare_save_rating')) {
         return;
     }
     
-    // Check if this is an autosave
-    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+=    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
     }
     
-    // Check user permissions
     if (!current_user_can('edit_post', $post_id)) {
         return;
     }
     
-    // Save the rating
     if (isset($_POST['business_rating'])) {
         $rating = sanitize_text_field($_POST['business_rating']);
         if (!empty($rating)) {
@@ -144,7 +166,6 @@ function bizshare_pagination($query = null) {
     
     echo '<div class="pagination-wrapper">';
     
-    // Previous button
     if ($current_page > 1) {
         echo '<a href="' . get_pagenum_link($current_page - 1) . '" class="pagination-btn pagination-prev">← Previous</a>';
     }
@@ -173,7 +194,6 @@ function bizshare_pagination($query = null) {
     
     echo '</div>';
     
-    // Next button
     if ($current_page < $total_pages) {
         echo '<a href="' . get_pagenum_link($current_page + 1) . '" class="pagination-btn pagination-next">Next →</a>';
     }
@@ -181,7 +201,6 @@ function bizshare_pagination($query = null) {
     echo '</div>';
 }
 
-// Add search functionality
 function bizshare_search_filter($query) {
     if (!is_admin() && $query->is_main_query() && $query->is_search) {
         $query->set('post_type', 'business');
@@ -189,7 +208,6 @@ function bizshare_search_filter($query) {
 }
 add_action('pre_get_posts', 'bizshare_search_filter');
 
-// Auto-create required pages on theme activation
 function bizshare_create_required_pages() {
     $pages = [
         [
@@ -215,7 +233,6 @@ function bizshare_create_required_pages() {
     ];
     
     foreach ($pages as $page) {
-        // Check if page exists
         $existing_page = get_page_by_path($page['slug']);
         
         if (!$existing_page) {
@@ -229,62 +246,75 @@ function bizshare_create_required_pages() {
             
             $page_id = wp_insert_post($new_page);
             
-            // Set page template if provided
             if (!empty($page['template']) && $page_id) {
                 update_post_meta($page_id, '_wp_page_template', $page['template']);
             }
         }
     }
     
-    // Flush rewrite rules
     flush_rewrite_rules();
 }
 add_action('after_switch_theme', 'bizshare_create_required_pages');
 
-// Temporary function to check pages - remove after testing
-function bizshare_check_pages() {
-    if (current_user_can('manage_options') && is_admin()) {
-        $pages = ['dashboard', 'top-businesses', 'search-business', 'contact'];
-        $missing_pages = [];
-        
-        foreach ($pages as $page_slug) {
-            $page = get_page_by_path($page_slug);
-            if (!$page) {
-                $missing_pages[] = $page_slug;
-            }
-        }
-        
-        if (!empty($missing_pages)) {
-            add_action('admin_notices', function() use ($missing_pages) {
-                echo '<div class="notice notice-warning is-dismissible">';
-                echo '<p><strong>BizShare:</strong> Missing pages: ' . implode(', ', $missing_pages) . '. <a href="' . admin_url('themes.php?page=theme-settings') . '">Click here to create them</a> or reactivate the theme.</p>';
-                echo '</div>';
-            });
-        }
+function bizshare_get_page_url($slug) {
+    $page = get_page_by_path($slug);
+    if ($page) {
+        return get_permalink($page->ID);
     }
-}
-add_action('admin_init', 'bizshare_check_pages');
-
-// Fix for rating display in top businesses page
-function bizshare_fix_rating_meta() {
-    // This ensures we're using the correct meta key
-    $args = array(
-        'post_type' => 'business',
-        'meta_key' => 'business_rating',
-        'posts_per_page' => -1
-    );
     
-    $posts = get_posts($args);
-    foreach ($posts as $post) {
-        $old_rating = get_post_meta($post->ID, 'business_rating', true);
-        if ($old_rating && !get_post_meta($post->ID, '_business_rating', true)) {
-            update_post_meta($post->ID, '_business_rating', $old_rating);
+    $page = get_page_by_title($slug);
+    if ($page) {
+        return get_permalink($page->ID);
+    }
+    
+    return home_url('/' . $slug . '/');
+}
+
+function bizshare_add_business_to_main_query($query) {
+    if (!is_admin() && $query->is_main_query() && ($query->is_home() || $query->is_archive())) {
+        $query->set('post_type', array('post', 'business'));
+    }
+}
+add_action('pre_get_posts', 'bizshare_add_business_to_main_query');
+
+function bizshare_fallback_menu() {
+    ?>
+    <a href="<?php echo bizshare_get_page_url('top-businesses'); ?>" class="nav-btn">Top Businesses</a>
+    <a href="<?php echo bizshare_get_page_url('search-business'); ?>" class="nav-btn">Search</a>
+    <a href="<?php echo bizshare_get_page_url('contact'); ?>" class="nav-btn">Contact</a>
+    <a href="<?php echo bizshare_get_page_url('dashboard'); ?>" class="nav-btn">Add And Rate</a>
+    <?php
+}
+
+function bizshare_fix_rating_display() {
+    $businesses = get_posts([
+        'post_type' => 'business',
+        'posts_per_page' => -1,
+        'meta_query' => [
+            'relation' => 'OR',
+            [
+                'key' => 'business_rating',
+                'compare' => 'EXISTS'
+            ],
+            [
+                'key' => '_business_rating', 
+                'compare' => 'EXISTS'
+            ]
+        ]
+    ]);
+    
+    foreach ($businesses as $business) {
+        $old_rating = get_post_meta($business->ID, 'business_rating', true);
+        $new_rating = get_post_meta($business->ID, '_business_rating', true);
+        
+        if ($old_rating && !$new_rating) {
+            update_post_meta($business->ID, '_business_rating', $old_rating);
+            delete_post_meta($business->ID, 'business_rating');
         }
     }
 }
-add_action('init', 'bizshare_fix_rating_meta');
+add_action('init', 'bizshare_fix_rating_display');
 
-// Add theme settings page
 function bizshare_theme_settings_page() {
     add_theme_page(
         'BizShare Settings',
@@ -302,7 +332,6 @@ function bizshare_theme_settings_html() {
         <h1>BizShare Theme Settings</h1>
         
         <?php
-        // Handle page creation request
         if (isset($_POST['create_pages']) && check_admin_referer('bizshare_create_pages')) {
             bizshare_create_required_pages();
             echo '<div class="notice notice-success is-dismissible"><p>Pages created successfully!</p></div>';
@@ -322,13 +351,19 @@ function bizshare_theme_settings_html() {
             <h2>Current Pages Status</h2>
             <ul>
                 <?php
-                $pages = ['dashboard', 'top-businesses', 'search-business', 'contact'];
-                foreach ($pages as $page_slug) {
-                    $page = get_page_by_path($page_slug);
+                $pages = [
+                    'dashboard' => 'Dashboard',
+                    'top-businesses' => 'Top Businesses', 
+                    'search-business' => 'Search Business',
+                    'contact' => 'Contact'
+                ];
+                
+                foreach ($pages as $slug => $title) {
+                    $page = get_page_by_path($slug);
                     if ($page) {
-                        echo '<li>✓ ' . $page_slug . ' - <a href="' . get_edit_post_link($page->ID) . '">Edit</a> | <a href="' . get_permalink($page->ID) . '">View</a></li>';
+                        echo '<li>✓ ' . $title . ' - <a href="' . get_edit_post_link($page->ID) . '">Edit</a> | <a href="' . get_permalink($page->ID) . '">View</a></li>';
                     } else {
-                        echo '<li>✗ ' . $page_slug . ' - Missing</li>';
+                        echo '<li>✗ ' . $title . ' - Missing</li>';
                     }
                 }
                 ?>
@@ -338,20 +373,32 @@ function bizshare_theme_settings_html() {
     <?php
 }
 
-// Helper function to get page URL safely
-function bizshare_get_page_url($slug) {
-    $page = get_page_by_path($slug);
-    if ($page) {
-        return get_permalink($page->ID);
+function bizshare_check_required_pages() {
+    $required_pages = ['dashboard', 'top-businesses', 'search-business', 'contact'];
+    $missing_pages = [];
+    
+    foreach ($required_pages as $page_slug) {
+        $page = get_page_by_path($page_slug);
+        if (!$page) {
+            $missing_pages[] = $page_slug;
+        }
     }
-    return home_url('/' . $slug . '/');
+    
+    return $missing_pages;
 }
 
-// Ensure business posts appear in main query
-function bizshare_add_business_to_main_query($query) {
-    if (!is_admin() && $query->is_main_query() && ($query->is_home() || $query->is_archive())) {
-        $query->set('post_type', array('post', 'business'));
+function bizshare_admin_notice_missing_pages() {
+    if (!current_user_can('manage_options')) return;
+    
+    $missing_pages = bizshare_check_required_pages();
+    if (!empty($missing_pages)) {
+        ?>
+        <div class="notice notice-warning is-dismissible">
+            <p><strong>BizShare Theme:</strong> The following pages are missing: <?php echo implode(', ', $missing_pages); ?>. 
+            <a href="<?php echo admin_url('themes.php?page=bizshare-settings'); ?>">Click here to create them</a>.</p>
+        </div>
+        <?php
     }
 }
-add_action('pre_get_posts', 'bizshare_add_business_to_main_query');
+add_action('admin_notices', 'bizshare_admin_notice_missing_pages');
 ?>

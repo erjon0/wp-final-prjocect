@@ -14,8 +14,7 @@
     <a href="<?php echo bizshare_get_page_url('top-businesses'); ?>" class="nav-btn">Top Businesses</a>
     <a href="<?php echo bizshare_get_page_url('search-business'); ?>" class="nav-btn">Search</a>
     <a href="<?php echo bizshare_get_page_url('contact'); ?>" class="nav-btn">Contact</a>
-    <a href="<?php echo bizshare_get_page_url('dashboard'); ?>" class="nav-btn">Dashboard</a>
-
+    <a href="<?php echo bizshare_get_page_url('dashboard'); ?>" class="nav-btn">Add And Rate</a>
 </nav>
 <div class="header-search">
 <form method="get" action="<?php echo bizshare_get_page_url('search-business'); ?>" class="header-search-form">
